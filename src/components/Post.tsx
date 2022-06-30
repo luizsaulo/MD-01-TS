@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FormEvent, useState, ChangeEvent, InvalidEvent } from 'react'
 import { format, formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
@@ -7,7 +7,23 @@ import Comment from './Comment';
 
 import styles from './Post.module.css';
 
-export default function Post({ author, publishedIn, content }) {
+interface Author {
+    name: string;
+    role: string;
+    avatarUrl: string;
+}
+
+interface Content {
+    type: 'paragraph' | 'link';
+    content: string;
+}
+interface PostProps {
+    author: Author;
+    publishedIn: Date;
+    content: [Content];
+}
+
+export default function Post({ author, publishedIn, content }: PostProps) {
     const [comments, setComments] = useState([
         'Post muito bacana'
     ])
@@ -23,24 +39,24 @@ export default function Post({ author, publishedIn, content }) {
         addSuffix: true
     });
 
-    function handleCreateNewComment() {
+    function handleCreateNewComment(event: FormEvent) {
         event.preventDefault()
 
         setComments([...comments, newCommentText]);
         setNewCommentText('');
     }
 
-    function handleNewCommentChange() {
+    function handleNewCommentChange(event: ChangeEvent<HTMLTextAreaElement>) {
         event.target.setCustomValidity(''); // comando para zerar o campo o deixando em branco após ele ser preenchido e enviado
         setNewCommentText(event.target.value);
     }
 
-    function handleNewCommentInvalid() {
+    function handleNewCommentInvalid(event: InvalidEvent<HTMLTextAreaElement>) {
         event.target.setCustomValidity('Este campo é obrigatório!');
         // comando para avisar que o campo precisa ser preenchido
     }
 
-    function deleteComment(commentToDelete) {
+    function deleteComment(commentToDelete: string) {
         const commentsWithoutDeletedOne = comments.filter(comment => {
             return comment !== commentToDelete;
         })
